@@ -15,15 +15,6 @@ pipeline {
 
                 }
         }
-            stage('Dockerfile Lint check') {
-                    steps {
-
-                        sh 'hadolint --ignore DL3006 --ignore SC2028 --ignore DL3008 --ignore DL3015 Dockerfile'
-
-
-
-                    }
-        }
             stage('Docker Image Building') {
                     steps {
 
