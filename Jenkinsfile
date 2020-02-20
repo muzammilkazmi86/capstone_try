@@ -50,7 +50,7 @@ pipeline {
                     steps {
 
                         sh "kubectl config use-context arn:aws:eks:us-west-2:595702470973:cluster/backup"
-                        sh "kubectl apply -f ./backup-controller.json"
+                        sh "kubectl apply -f ./blue.json"
 
 
 
@@ -63,7 +63,7 @@ pipeline {
         }
              stage('Routing traffic to backup') {
                     steps {
-                        sh "kubectl apply -f ./backup-service.json"
+                        sh "kubectl apply -f ./blue-service.json"
                         sh '''ELB="$(kubectl get svc blue -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
                               aws route53 change-resource-record-sets --hosted-zone-id ZDQ7GFDSQJGM6 --change-batch '{ "Comment": "creating a record set",  "Changes": [ { "Action": "UPSERT", "ResourceRecordSet": { "Name": "capstone.udac.com", "Type": "CNAME", "TTL": 120, "ResourceRecords": [ { "Value": "'"$ELB"'" } ] } } ] }'
                             '''
@@ -73,7 +73,7 @@ pipeline {
             stage('Deploy latest on production cluster') {
                     steps {
                         sh "kubectl config use-context arn:aws:eks:us-west-2:595702470973:cluster/prod"
-                        sh "kubectl apply -f ./prod-controller.json"
+                        sh "kubectl apply -f ./green.json"
 
 
 
@@ -86,7 +86,7 @@ pipeline {
         }
             stage('Routing traffic to prod') {
                     steps {
-                        sh "kubectl apply -f ./prod-service.json"
+                        sh "kubectl apply -f ./green-service.json"
                         sh '''ELB="$(kubectl get svc green -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
                               aws route53 change-resource-record-sets --hosted-zone-id ZDQ7GFDSQJGM6 --change-batch '{ "Comment": "creating a record set",  "Changes": [ { "Action": "UPSERT", "ResourceRecordSet": { "Name": "capstone.udac.com", "Type": "CNAME", "TTL": 120, "ResourceRecords": [ { "Value": "'"$ELB"'" } ] } } ] }'
                             '''
