@@ -49,7 +49,7 @@ pipeline {
             stage('Deploy latest on backup cluster') {
                     steps {
 
-                        sh "kubectl config use-context arn:aws:eks:us-west-2:595702470973:cluster/backup"
+                        sh "kubectl config use-context arn:aws:eks:us-west-2:595702470973:cluster/blue"
                         sh "kubectl apply -f ./blue.json"
 
 
@@ -72,7 +72,7 @@ pipeline {
         }
             stage('Deploy latest on production cluster') {
                     steps {
-                        sh "kubectl config use-context arn:aws:eks:us-west-2:595702470973:cluster/prod"
+                        sh "kubectl config use-context arn:aws:eks:us-west-2:595702470973:cluster/green"
                         sh "kubectl apply -f ./green.json"
 
 
